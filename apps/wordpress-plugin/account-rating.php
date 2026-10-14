@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Account Rating Badge
- * Description: [account_rating revenue="5000000"] shortcode that renders a Hot/Warm/Cold badge.
+ * Description: [account_rating revenue="5000000"] shortcode that renders a Hot/Warm/Undefined badge.
  * Version: 0.1.0
  */
 
@@ -17,7 +17,7 @@ function acct_rating_for( $revenue ) {
 	if ( $revenue >= 1000000 ) {
 		return 'Warm';
 	}
-	return 'Cold';
+	return 'Undefined';
 }
 
 function acct_rating_shortcode( $atts ) {

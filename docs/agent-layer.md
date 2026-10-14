@@ -21,6 +21,7 @@ The Salesforce, .NET, React and WordPress code is only a fixture to prove it wor
 | Protected paths | PreToolUse on file writes and Bash | The agent editing its own hooks and settings, CI workflows or env files | 8 |
 | Audit log | PostToolUse on every tool | Nothing; gives a record of every tool call, secrets masked, stored outside the repo | 2 |
 | Verification loop | Stop hook | The agent declaring "done" while tests fail. Bounded to 3 attempts, then escalates to a human | 8 |
+| Org test before finishing | `scripts/org-test.sh` plus an evidence check in `verify.sh` | Salesforce changes being finished without being validated, deployed and tested in a sandbox or Developer Edition org. Refuses any other org type. Evidence is tied to a fingerprint of the source, so edits after testing invalidate it | 15 |
 | Instant lint | PostToolUse on edits | Syntax errors in PHP/JSON/XML caught on the edit rather than at CI | |
 | Session context | SessionStart | Agents guessing paths: injects discovered stacks and script locations | |
 
@@ -40,6 +41,24 @@ agent tries to finish
   code change and keep the gate firing. A test caught this.
 - Counters are per session, so two sessions do not interfere.
 - Docs-only changes are not gated.
+
+## Testing in the org
+Reviews and unit tests are not enough for Salesforce: governor limits, triggers, flows and
+sharing only show up in a real org. So `scripts/org-test.sh`:
+
+1. asks the org what it is (`IsSandbox`, `OrganizationType`), and refuses to deploy to
+   anything that is not a sandbox or a Developer Edition org (validate-only is allowed anywhere);
+2. validates the source, then deploys it, then runs the Apex test suite **in the org** and reads
+   each test result back, so the PR carries real deploy IDs, per-test outcomes and coverage;
+3. stops at the first failing stage, so a failed validate never reaches deploy;
+4. records evidence tied to a fingerprint of the package directories. The Stop hook (through
+   `verify.sh --changed`) rejects "done" if Salesforce files changed and there is no matching
+   evidence, and also if the code changed after the last org test. CI is exempt because it runs
+   its own validate and coverage gates.
+
+It retries a validate or test run once on a transient network error. It never retries a deploy.
+Known limit: the evidence is a file the script writes, so an agent that forges it would pass the
+local check. The CI re-run and branch protection are the real backstop.
 
 ## Stack discovery
 `scripts/detect-stacks.py` reads `sfdx-project.json` for Salesforce package directories and

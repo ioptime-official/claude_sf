@@ -7,8 +7,8 @@ $cases = array(
 	array( 20000000, 'Hot' ),
 	array( 10000000, 'Hot' ),
 	array( 5000000, 'Warm' ),
-	array( 999999, 'Cold' ),
-	array( 'abc', 'Cold' ),
+	array( 999999, 'Undefined' ),
+	array( 'abc', 'Undefined' ),
 );
 $failed = 0;
 foreach ( $cases as $c ) {

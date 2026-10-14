@@ -59,7 +59,7 @@ block is wrong, say so and a human will change the rule.
 (every PR), `test-writer` (missing tests), `change-request-triager` (business requests).
 
 ## Cross-stack invariant (this demo)
-Rating thresholds (>= 10,000,000 Hot, >= 1,000,000 Warm, else Cold) are identical in Apex
+Rating thresholds (>= 10,000,000 Hot, >= 1,000,000 Warm, else Undefined) are identical in Apex
 (`AccountService`), C# (`RatingService`) and PHP (`acct_rating_for`). Change all together.
 
 ## Commands

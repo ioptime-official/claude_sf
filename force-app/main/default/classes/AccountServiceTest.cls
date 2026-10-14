@@ -12,7 +12,7 @@ private class AccountServiceTest {
         Test.stopTest();
         System.assertEquals('Hot', accounts[0].Rating);
         System.assertEquals('Warm', accounts[1].Rating);
-        System.assertEquals('Cold', accounts[2].Rating);
+        System.assertEquals('Undefined', accounts[2].Rating);
     }
 
     @IsTest
@@ -35,5 +35,19 @@ private class AccountServiceTest {
         AccountService.applyRating(new List<Account>{ noRevenue });
         AccountService.applyRating(null);
         System.assertEquals(null, noRevenue.Rating);
+    }
+
+    @IsTest
+    static void applyRating_bandBoundaries() {
+        List<Decimal> revenues = new List<Decimal>{ 0, 999999, 1000000, 9999999, 10000000 };
+        List<String> expected = new List<String>{ 'Undefined', 'Undefined', 'Warm', 'Warm', 'Hot' };
+        List<Account> accounts = new List<Account>();
+        for (Decimal revenue : revenues) {
+            accounts.add(new Account(Name = 'Boundary ' + revenue, AnnualRevenue = revenue));
+        }
+        AccountService.applyRating(accounts);
+        for (Integer i = 0; i < accounts.size(); i++) {
+            System.assertEquals(expected[i], accounts[i].Rating, 'Revenue ' + revenues[i]);
+        }
     }
 }

@@ -3,12 +3,12 @@ private class AccountTriggerTest {
     @IsTest
     static void insert_setsRatingFromRevenue() {
         Account hot = new Account(Name = 'Trigger Hot', AnnualRevenue = 20000000);
-        Account cold = new Account(Name = 'Trigger Cold', AnnualRevenue = 100);
+        Account low = new Account(Name = 'Trigger Low', AnnualRevenue = 100);
         Test.startTest();
-        insert new List<Account>{ hot, cold };
+        insert new List<Account>{ hot, low };
         Test.stopTest();
         System.assertEquals('Hot', [SELECT Rating FROM Account WHERE Id = :hot.Id].Rating);
-        System.assertEquals('Cold', [SELECT Rating FROM Account WHERE Id = :cold.Id].Rating);
+        System.assertEquals('Undefined', [SELECT Rating FROM Account WHERE Id = :low.Id].Rating);
     }
 
     @IsTest
@@ -32,5 +32,16 @@ private class AccountTriggerTest {
         update a;
         Test.stopTest();
         System.assertEquals('Hot', [SELECT Rating FROM Account WHERE Id = :a.Id].Rating);
+    }
+
+    @IsTest
+    static void update_downgradesToUndefinedWhenRevenueDrops() {
+        Account a = new Account(Name = 'Faller', AnnualRevenue = 50000000);
+        insert a;
+        a.AnnualRevenue = 999999;
+        Test.startTest();
+        update a;
+        Test.stopTest();
+        System.assertEquals('Undefined', [SELECT Rating FROM Account WHERE Id = :a.Id].Rating);
     }
 }

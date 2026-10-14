@@ -34,19 +34,7 @@ changed="$(git status --porcelain | awk '{print $2}')"
 [ -n "$changed" ] || { echo "No changes were made."; git checkout -q "$base"; git branch -D "$branch" -q; rm -f .local-run-summary.txt; exit 0; }
 
 echo "==> Independent verification (not trusting the agent's own report)"
-if echo "$changed" | grep -q '^apps/react-web'; then
-  (cd apps/react-web && npm install --no-audit --no-fund >/dev/null && npm test && npm run build >/dev/null)
-fi
-if echo "$changed" | grep -q '^apps/wordpress-plugin'; then
-  find apps/wordpress-plugin -name '*.php' -print0 | xargs -0 -n1 php -l >/dev/null
-  php apps/wordpress-plugin/tests/rating-test.php
-fi
-if echo "$changed" | grep -q '^apps/dotnet-api' && command -v dotnet >/dev/null; then
-  dotnet test apps/dotnet-api/tests/Api.Tests
-fi
-if echo "$changed" | grep -q '^tests/hooks\|^\.claude/hooks'; then
-  bash tests/hooks/test-block-prod-deploy.sh >/dev/null
-fi
+bash scripts/verify.sh --changed --full || { echo "Verification failed; branch $branch left uncommitted for inspection." >&2; exit 1; }
 
 echo "==> Read-only review by the code-reviewer subagent"
 git add -A -- . ':!.local-run-summary.txt'

@@ -1,6 +1,7 @@
 # Deployment guide
 
 ## One-time setup
+0. Use Node 22 or newer for the Salesforce CLI (`nvm install 22`); Node 20 crashes recent CLI releases.
 1. Create a Dev Hub (or use a sandbox) and authenticate: `sf org login web --alias sandbox`.
 2. Get its auth URL: `sf org display --target-org sandbox --verbose` and store as
    GitHub secret `SF_SANDBOX_AUTH_URL`. Repeat for `SF_STAGING_AUTH_URL`, `SF_PROD_AUTH_URL`.

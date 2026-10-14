@@ -1,6 +1,8 @@
 name: CI gate
 # Always runs on PRs and reports one stable status ("gate") that branch protection can require,
-# even though the per-app workflows are path-filtered and may be skipped.
+# even though per-app workflows are path-filtered and may be skipped.
+# Stack discovery and checks come from scripts/detect-stacks.py and scripts/verify.sh, so this
+# works for any repo layout (sfdx-project.json package directories, any app folder names).
 on:
   pull_request:
 
@@ -14,19 +16,13 @@ jobs:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
       - uses: actions/setup-node@v4
-        with: { node-version: 20 }
-      - name: Run checks for changed areas
+        with: { node-version: 22 }
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: 8.0.x }
+      - name: Agent-layer tests
         run: |
-          changed="$(git diff --name-only origin/${{ github.base_ref }}...HEAD)"
-          has() { echo "$changed" | grep -Eq "$1"; }
-          if has '^(\.claude/hooks|tests/hooks)/'; then
-            bash tests/hooks/test-block-prod-deploy.sh
-          fi
-          if has '^apps/react-web/'; then
-            (cd apps/react-web && npm install --no-audit --no-fund && npm test && npm run build)
-          fi
-          if has '^apps/wordpress-plugin/'; then
-            find apps/wordpress-plugin -name '*.php' -print0 | xargs -0 -n1 php -l
-            php apps/wordpress-plugin/tests/rating-test.php
-          fi
-          echo "gate passed"
+          bash tests/hooks/test-block-prod-deploy.sh
+          bash tests/hooks/test-stop-verify-gate.sh
+          bash tests/scripts/test-detect-stacks.sh
+      - name: Verify changed stacks (Salesforce validate runs in validate-deploy.yml)
+        run: bash scripts/verify.sh --changed origin/${{ github.base_ref }} --full --no-salesforce

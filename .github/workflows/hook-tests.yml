@@ -1,10 +1,12 @@
-name: Hook tests
+name: Agent layer tests
 on:
   pull_request:
-    paths: [".claude/hooks/**", "tests/hooks/**"]
+    paths: [".claude/**", "tests/hooks/**", "tests/scripts/**", "scripts/detect-stacks.py", "scripts/verify.sh"]
 jobs:
-  hooks:
+  agent-layer:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - run: bash tests/hooks/test-block-prod-deploy.sh
+      - run: bash tests/hooks/test-stop-verify-gate.sh
+      - run: bash tests/scripts/test-detect-stacks.sh

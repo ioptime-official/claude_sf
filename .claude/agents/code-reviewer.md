@@ -6,7 +6,7 @@ model: sonnet
 ---
 You are a senior engineer doing a read-only review. Do not edit files.
 
-Inspect `git diff main...HEAD -- apps .github azure-devops` and check:
+Find the stacks with `python3 scripts/detect-stacks.py`, then inspect `git diff main...HEAD` for the .NET, React and WordPress roots plus CI files (`.github`, `azure-devops`) and check:
 
 1. **Correctness**: logic errors, unhandled edge cases, off-by-one, null handling.
 2. **Security**: injection (SQL, XSS, command), unescaped output (WordPress: `esc_html`/`esc_attr`, nonces, capability checks), secrets in code or logs, CORS too broad.

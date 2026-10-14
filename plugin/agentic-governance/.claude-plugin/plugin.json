@@ -1,0 +1,15 @@
+{
+  "name": "agentic-governance",
+  "version": "0.1.0",
+  "description": "Governed AI-assisted change pipeline: guardrail hooks, a bounded verification loop, review subagents and skills for Salesforce, .NET, React and WordPress repos.",
+  "author": {
+    "name": "Zeeshan Farooq"
+  },
+  "keywords": [
+    "salesforce",
+    "governance",
+    "hooks",
+    "code-review",
+    "ci"
+  ]
+}

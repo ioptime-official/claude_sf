@@ -1,0 +1,12 @@
+{
+  "name": "agentic-pipeline",
+  "description": "Governed AI-assisted change pipeline for Salesforce, .NET, React and WordPress repositories.",
+  "owner": { "name": "Zeeshan Farooq" },
+  "plugins": [
+    {
+      "name": "agentic-governance",
+      "source": "./plugin/agentic-governance",
+      "description": "Guardrail hooks, bounded verification loop, review subagents and skills for governed AI-assisted changes."
+    }
+  ]
+}

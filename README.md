@@ -8,10 +8,13 @@ Claude Code drafts them; engineers and CI gate what ships.
 | Piece | Where |
 |---|---|
 | Project rules for the agent | [CLAUDE.md](CLAUDE.md) |
-| Hooks (guardrails) | [.claude/hooks/](.claude/hooks/) |
+| Hooks (guardrails, verification loop) | [.claude/hooks/](.claude/hooks/) |
 | Subagents | [.claude/agents/](.claude/agents/) |
 | Slash commands | [.claude/commands/](.claude/commands/) |
 | MCP servers | [.mcp.json](.mcp.json) |
+| Skills, evals | [.claude/skills/](.claude/skills/), [evals/](evals/) |
+| Installable plugin | [plugin/agentic-governance/](plugin/agentic-governance/) |
+| How the agent layer works | [docs/agent-layer.md](docs/agent-layer.md) |
 | Headless CI workflows | [.github/workflows/](.github/workflows/) |
 | Sample apps (.NET, React, WordPress) | [apps/](apps/) |
 | Azure DevOps pipeline | [azure-devops/](azure-devops/) |
@@ -22,5 +25,5 @@ See [docs/architecture.md](docs/architecture.md) for the flow diagram.
 
 ## Try it
 ```bash
-bash tests/hooks/test-block-prod-deploy.sh   # prove the deploy guardrail works
+npm run test:agent-layer   # prove every guardrail and the plugin work
 ```

@@ -1,0 +1,10 @@
+# Files the agent must not modify. One glob per line, relative to the repo root.
+# A human can override for one session with ALLOW_PROTECTED_EDIT=1 in the environment that
+# launches Claude Code; the agent cannot set it for the hook.
+.claude/settings.json
+.claude/settings.local.json
+.claude/protected-paths.txt
+.claude/hooks/*
+.github/workflows/*
+.env
+.env.*

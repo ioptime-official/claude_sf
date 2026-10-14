@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "test:e2e": "playwright test",
-    "test:hooks": "bash tests/hooks/test-block-prod-deploy.sh"
+    "test:agent-layer": "bash tests/hooks/test-block-prod-deploy.sh && bash tests/hooks/test-stop-verify-gate.sh && bash tests/hooks/test-guard-hooks.sh && bash tests/scripts/test-detect-stacks.sh && bash tests/plugin/test-plugin.sh",
+    "verify": "bash scripts/verify.sh --no-salesforce --full",
+    "build:plugin": "bash scripts/build-plugin.sh"
   },
   "devDependencies": {
     "@playwright/test": "^1.48.0"

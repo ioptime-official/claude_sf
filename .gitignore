@@ -12,3 +12,5 @@ bin/
 obj/
 .local-run-summary.txt
 .local-review.md
+plugin/*/evals/results/
+evals/results/

@@ -16,12 +16,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20 }
+        with: { node-version: 22 }
       - run: npm install -g @salesforce/cli
       - name: Auth to sandbox
         run: echo "${{ secrets.SF_SANDBOX_AUTH_URL }}" > auth.txt && sf org login sfdx-url --sfdx-url-file auth.txt --alias sandbox && rm auth.txt
       - name: Validate only (no deploy)
         run: sf project deploy validate --source-dir force-app --target-org sandbox --test-level RunLocalTests
+      - name: Coverage gate
+        run: |
+          sf apex run test --test-level RunLocalTests --code-coverage --json --wait 20 --target-org sandbox > apex-result.json
+          bash scripts/check-apex-coverage.sh apex-result.json 85
 
   deploy-staging:
     if: github.event_name == 'push'
@@ -30,7 +34,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20 }
+        with: { node-version: 22 }
       - run: npm install -g @salesforce/cli
       - run: echo "${{ secrets.SF_STAGING_AUTH_URL }}" > auth.txt && sf org login sfdx-url --sfdx-url-file auth.txt --alias staging && rm auth.txt
       - run: sf project deploy start --source-dir force-app --target-org staging --test-level RunLocalTests
@@ -43,7 +47,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20 }
+        with: { node-version: 22 }
       - run: npm install -g @salesforce/cli
       - run: echo "${{ secrets.SF_PROD_AUTH_URL }}" > auth.txt && sf org login sfdx-url --sfdx-url-file auth.txt --alias production && rm auth.txt
       - run: sf project deploy start --source-dir force-app --target-org production --test-level RunLocalTests

@@ -1,51 +1,57 @@
 # agentic-salesforce-pipeline
 
-Salesforce DX project with an AI-assisted, governed change pipeline. Claude proposes
-changes; humans and CI approve and ship them.
+<!-- DRAFT: rewrite the rules below in your own words before showing this to anyone. -->
+
+An AI-assisted, governed change pipeline. Claude proposes changes; hooks, CI and humans
+decide what ships. This file must work in any client repo, so it never assumes folder names.
 
 ## Hard rules
-- NEVER deploy to production or any org not in the sandbox allowlist. A PreToolUse hook
-  enforces this; do not try to work around it. Production deploys happen only in CI
-  behind a GitHub Environment approval.
-- Never commit secrets, auth URLs, or `.sfdx/` / `.sf/` contents.
+- NEVER deploy to production or to any org/slot not on the allowlist. The PreToolUse hook
+  enforces this (Salesforce and Azure CLI). Do not work around it. Production deploys happen
+  only in CI behind a GitHub Environment approval.
+- Never commit secrets, auth URLs, tokens or `.sfdx/` / `.sf/` contents. Do not try to
+  extract access tokens from the Salesforce CLI; it redacts them on purpose.
 - Work on a branch named `ai/<short-slug>`; never push to `main`.
-- Every Apex class change needs a test class change in the same PR; target >= 85% coverage.
+- Every production-code change needs a test change in the same PR.
 
-## Apex conventions
-- `with sharing` by default; justify `without sharing` in a comment.
-- Bulkify: no SOQL/DML inside loops; handle 200-record batches.
-- One trigger per object, logic in a handler/service class.
-- Tests use `@TestSetup` and assert behavior (no assertion-free tests).
+## Stack discovery (do this first, never assume paths)
+Run `python3 scripts/detect-stacks.py`. It reports, from file contents:
+- Salesforce package directories (from `sfdx-project.json`)
+- .NET service roots and test projects, React apps, WordPress plugins/themes
 
-## LWC conventions
-- Prefer base Lightning components; no inline styles; follow SLDS.
+Use those paths in every command and review. Do not hardcode `force-app/` or `apps/`.
 
-## Workflow
-1. Plan first for anything touching more than one component.
-2. Implement, then run Apex tests locally.
-3. Invoke the `apex-reviewer` subagent before opening a PR.
-4. Open a PR using `.github/PULL_REQUEST_TEMPLATE.md`; CI validates and reviews it.
+## The verification loop
+- Verify with `bash scripts/verify.sh --changed` (add `--full` for builds, `--only <stack>`
+  for one stack). It runs the right checks per discovered stack.
+- A Stop hook re-runs verification when you try to finish with code changes. If it fails you
+  are sent back to fix it, at most 3 times; after that it escalates to a human. Do not
+  suppress, edit or bypass the hook to get out of the loop.
+- Salesforce validation is validate-only (no deploy) against the sandbox alias.
 
-## Commands
-- Validate (no deploy): `sf project deploy validate --source-dir force-app --target-org $SF_SANDBOX_ALIAS --test-level RunLocalTests`
-- Run tests: `sf apex run test --test-level RunLocalTests --code-coverage --result-format human --target-org $SF_SANDBOX_ALIAS`
-- E2E: `npx playwright test`
-- Hook tests: `bash tests/hooks/test-block-prod-deploy.sh`
+## Conventions
+- **Apex**: `with sharing` by default; no SOQL/DML in loops; bulk-safe for 200 records;
+  one trigger per object with logic in a service class; tests assert behavior.
+- **LWC**: base Lightning components, SLDS, no inline styles.
+- **.NET**: validate request models, no secrets in config files, typed HTTP clients.
+- **React**: no secrets in `VITE_*` variables, tests with Testing Library.
+- **WordPress**: escape output, nonces and capability checks, `$wpdb->prepare`.
 
-## Per-stack commands
-- .NET API (`apps/dotnet-api`): `dotnet test apps/dotnet-api/tests/Api.Tests`
-- React (`apps/react-web`): `cd apps/react-web && npm install && npm test && npm run build`
-- WordPress (`apps/wordpress-plugin`): `php tests/rating-test.php` (run inside the plugin dir) and `php -l` on changed files
-- Azure: deploy only with `--slot staging` or `--what-if`; production swaps happen in CI behind an Environment approval.
-
-## Cross-stack invariant
-Rating thresholds (>= 10,000,000 Hot, >= 1,000,000 Warm, else Cold) must stay identical in
-Apex (`AccountService`), C# (`RatingService`) and PHP (`acct_rating_for`). Change all three
-together and update every test.
+## Guardrails you will meet
+Production deploys, secrets in written content, and edits to guardrails, CI workflows or env
+files are blocked by hooks. They are not suggestions; do not look for ways around them. If a
+block is wrong, say so and a human will change the rule.
 
 ## Review agents
-- `apex-reviewer` for `force-app/`; `code-reviewer` for `apps/`, `.github/`, `azure-devops/`.
+`apex-reviewer` (Salesforce), `code-reviewer` (.NET/React/WordPress/CI), `security-reviewer`
+(every PR), `test-writer` (missing tests), `change-request-triager` (business requests).
 
-## Layout
-- `force-app/` Salesforce source, `apps/` .NET / React / WordPress samples, `.claude/` agents/commands/hooks, `.github/workflows/` CI,
-  `docs/` governance and training material.
+## Cross-stack invariant (this demo)
+Rating thresholds (>= 10,000,000 Hot, >= 1,000,000 Warm, else Cold) are identical in Apex
+(`AccountService`), C# (`RatingService`) and PHP (`acct_rating_for`). Change all together.
+
+## Commands
+- Agent-layer tests: `npm run test:agent-layer`
+- Rebuild the plugin after changing the agent layer: `npm run build:plugin`
+- Everything except the org: `npm run verify`
+- Change request, locally: `bash scripts/run-change-request.sh "<request>"`

@@ -6,7 +6,7 @@ model: sonnet
 ---
 You help business users turn an idea into an engineering-ready change request. Do not edit files.
 
-Given the request, inspect `force-app/` to see what exists, then produce:
+Given the request, run `python3 scripts/detect-stacks.py` and inspect the discovered source roots to see what exists, then produce:
 
 ```
 Title:

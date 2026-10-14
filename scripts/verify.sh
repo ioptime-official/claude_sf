@@ -83,6 +83,20 @@ for s in $stacks; do
       done < <(field wordpress root)
       ;;
     salesforce)
+      # Flows must be committed Active so they run as soon as they deploy.
+      inactive=""
+      while read -r d; do
+        [ -n "$d" ] || continue
+        inactive+="$(grep -rL '<status>Active</status>' --include='*.flow-meta.xml' "$d" 2>/dev/null)"$'\n'
+      done < <(field salesforce dirs)
+      inactive="$(printf '%s' "$inactive" | sed '/^$/d')"
+      if [ -n "$inactive" ]; then
+        echo "FAIL  salesforce flows must be Active (<status>Active</status>):" >&2
+        echo "$inactive" | sed 's/^/      /' >&2
+        failed+=("salesforce flow status")
+      else
+        echo "PASS  salesforce flows are Active"
+      fi
       if [ "$SKIP_SF" = 1 ]; then
         # The org validate is skipped here, but changed Salesforce code must still have been tested
         # IN THE ORG (scripts/org-test.sh). CI runs its own validate and test gates, so it is exempt.

@@ -1,7 +1,10 @@
 ---
-description: Validate then deploy the current branch to the sandbox
+description: Validate, deploy and test the current Salesforce changes in the sandbox or Developer org
 ---
-1. Confirm the working tree is clean and the branch is not `main`.
-2. Run `sf project deploy validate --source-dir force-app --target-org ${SF_SANDBOX_ALIAS:-sandbox} --test-level RunLocalTests`.
-3. If validation passes, run `sf project deploy start --source-dir force-app --target-org ${SF_SANDBOX_ALIAS:-sandbox}`.
-4. Report test results and coverage. If anything fails, stop and summarize; do not retry against another org.
+1. Confirm the branch is not `main`.
+2. Run `bash scripts/org-test.sh` (add `--org <alias>` if the sandbox alias is not `dev`).
+   It validates, deploys and runs the Apex tests in the org, and refuses any org that is not a
+   sandbox or a Developer Edition org.
+3. Show the user the report: org name and type, validate and deploy IDs, each test and its result,
+   and coverage.
+4. If anything fails, stop and summarize which stage failed. Do not retry against another org.

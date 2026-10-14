@@ -27,7 +27,19 @@ Use those paths in every command and review. Do not hardcode `force-app/` or `ap
 - A Stop hook re-runs verification when you try to finish with code changes. If it fails you
   are sent back to fix it, at most 3 times; after that it escalates to a human. Do not
   suppress, edit or bypass the hook to get out of the loop.
-- Salesforce validation is validate-only (no deploy) against the sandbox alias.
+- `verify.sh` also requires org-test evidence for changed Salesforce code (see below).
+
+## Salesforce changes are tested in the org (required)
+A Salesforce change is not done until it has been tested IN THE ORG, not just reviewed:
+1. Run `bash scripts/org-test.sh`. It validates against the org, then deploys, then runs the
+   Apex test suite in the org and reads each test result back.
+2. It only deploys to a **sandbox or Developer Edition** org (it checks `IsSandbox` and
+   `OrganizationType`). Anything else is refused. `--validate-only` is allowed everywhere.
+3. Put the report (deploy ID, each test, coverage) in the PR description under test evidence.
+4. If the code changes after the run, run it again. The Stop hook compares a fingerprint of the
+   source, so stale evidence is rejected and you will be sent back.
+5. Do not call the Salesforce CLI deploy command by hand; use the script so the org-type check
+   and the evidence record are not skipped.
 
 ## Conventions
 - **Apex**: `with sharing` by default; no SOQL/DML in loops; bulk-safe for 200 records;

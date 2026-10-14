@@ -6,7 +6,9 @@ description: Promotion path, approval gates and rollback steps for releasing cha
 
 ## Promotion path
 1. PR opened from an `ai/*` or feature branch. CI runs: verification, coverage gate, AI review.
-2. **Validate-only** deploy to the sandbox with `RunLocalTests` (no metadata changes).
+2. **Org test** in a sandbox or Developer Edition org: `scripts/org-test.sh` validates, deploys and
+   runs the Apex tests in the org, and records evidence tied to the exact source tested. CI also
+   runs a validate-only deploy with `RunLocalTests`.
 3. Human approval on the PR (required reviewer) and green `gate` status.
 4. Merge to `main` triggers deploy to **staging**, then end-to-end tests.
 5. **Production** deploy waits on the `production` Environment approval.

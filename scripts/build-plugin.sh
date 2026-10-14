@@ -17,7 +17,7 @@ cp .claude/agents/*.md "$dest/agents/"
 cp .claude/commands/*.md "$dest/commands/"
 cp -R .claude/skills/. "$dest/skills/"
 if [ -d evals ]; then mkdir -p "$dest/evals"; cp -R evals/. "$dest/evals/"; rm -rf "$dest/evals/results"; fi
-cp scripts/detect-stacks.py scripts/verify.sh "$dest/scripts/"
+cp scripts/detect-stacks.py scripts/verify.sh scripts/org-test.sh scripts/sf-fingerprint.py scripts/check-apex-coverage.sh "$dest/scripts/"
 cp .claude/protected-paths.txt "$dest/protected-paths.txt"
 for h in block-prod-deploy secret-guard protected-paths audit-log post-edit-lint stop-verify-gate session-context; do
   cp ".claude/hooks/$h.sh" "$dest/hooks/$h.sh"
@@ -64,9 +64,10 @@ for sub in ("agents", "commands"):
     for fn in os.listdir(f"{d}/{sub}"):
         fp = f"{d}/{sub}/{fn}"
         t = open(fp).read()
-        if "scripts/detect-stacks.py" in t or "scripts/verify.sh" in t:
+        if "scripts/detect-stacks.py" in t or "scripts/verify.sh" in t or "scripts/org-test.sh" in t:
             t = t.replace("scripts/detect-stacks.py", "<scripts-dir>/detect-stacks.py")
             t = t.replace("scripts/verify.sh", "<scripts-dir>/verify.sh")
+            t = t.replace("scripts/org-test.sh", "<scripts-dir>/org-test.sh")
             t = t.rstrip("\n") + note
             open(fp, "w").write(t)
 

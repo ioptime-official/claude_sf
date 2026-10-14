@@ -33,4 +33,8 @@ private class AccountTriggerTest {
         Test.stopTest();
         System.assertEquals('Hot', [SELECT Rating FROM Account WHERE Id = :a.Id].Rating);
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> e2ebfe99cf78b1317530f1b9f387511ea1b525ca

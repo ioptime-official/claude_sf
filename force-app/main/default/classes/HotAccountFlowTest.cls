@@ -19,8 +19,4 @@ private class HotAccountFlowTest {
         Test.stopTest();
         System.assertEquals(0, [SELECT COUNT() FROM Task WHERE WhatId = :a.Id]);
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> e2ebfe99cf78b1317530f1b9f387511ea1b525ca

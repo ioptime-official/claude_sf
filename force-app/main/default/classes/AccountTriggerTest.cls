@@ -8,7 +8,7 @@ private class AccountTriggerTest {
         insert new List<Account>{ hot, cold };
         Test.stopTest();
         System.assertEquals('Hot', [SELECT Rating FROM Account WHERE Id = :hot.Id].Rating);
-        System.assertEquals('Cold', [SELECT Rating FROM Account WHERE Id = :cold.Id].Rating);
+        System.assertEquals('Undefined', [SELECT Rating FROM Account WHERE Id = :cold.Id].Rating);
     }
 
     @IsTest

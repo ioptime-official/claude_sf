@@ -9,5 +9,5 @@ public static class RatingService
     public static string Rate(decimal annualRevenue) =>
         annualRevenue >= HotThreshold ? "Hot"
         : annualRevenue >= WarmThreshold ? "Warm"
-        : "Cold";
+        : "Undefined";
 }

@@ -12,7 +12,7 @@ private class AccountServiceTest {
         Test.stopTest();
         System.assertEquals('Hot', accounts[0].Rating);
         System.assertEquals('Warm', accounts[1].Rating);
-        System.assertEquals('Cold', accounts[2].Rating);
+        System.assertEquals('Undefined', accounts[2].Rating);
     }
 
     @IsTest
@@ -35,5 +35,20 @@ private class AccountServiceTest {
         AccountService.applyRating(new List<Account>{ noRevenue });
         AccountService.applyRating(null);
         System.assertEquals(null, noRevenue.Rating);
+    }
+
+    @IsTest
+    static void applyRating_boundaries() {
+        List<Account> accounts = new List<Account>{
+            new Account(Name = 'A', AnnualRevenue = 10000000),
+            new Account(Name = 'B', AnnualRevenue = 9999999),
+            new Account(Name = 'C', AnnualRevenue = 1000000),
+            new Account(Name = 'D', AnnualRevenue = 999999)
+        };
+        AccountService.applyRating(accounts);
+        System.assertEquals('Hot', accounts[0].Rating);
+        System.assertEquals('Warm', accounts[1].Rating);
+        System.assertEquals('Warm', accounts[2].Rating);
+        System.assertEquals('Undefined', accounts[3].Rating);
     }
 }

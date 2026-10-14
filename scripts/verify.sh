@@ -83,7 +83,37 @@ for s in $stacks; do
       done < <(field wordpress root)
       ;;
     salesforce)
-      if [ "$SKIP_SF" = 1 ]; then skip "salesforce" "--no-salesforce"; continue; fi
+      if [ "$SKIP_SF" = 1 ]; then
+        # The org validate is skipped here, but changed Salesforce code must still have been tested
+        # IN THE ORG (scripts/org-test.sh). CI runs its own validate and test gates, so it is exempt.
+        if [ "$CHANGED" = 1 ] && [ -z "${CI:-}" ] && [ -z "${TF_BUILD:-}" ] && [ -z "${VERIFY_NO_ORG_EVIDENCE:-}" ]; then
+          ev="${TMPDIR:-/tmp}/claude-org-test/evidence-$(pwd | cksum | awk '{print $1}').json"
+          now="$(python3 "$SCRIPT_DIR/sf-fingerprint.py" 2>/dev/null || echo none)"
+          if python3 - "$ev" "$now" <<'PY'
+import json, sys
+path, now = sys.argv[1], sys.argv[2]
+try:
+    e = json.load(open(path))
+except Exception:
+    sys.exit(2)
+sys.exit(0 if (e.get("passed") and e.get("mode") == "deploy" and e.get("fingerprint") == now) else 3)
+PY
+          then echo "PASS  salesforce org test evidence (tested in the org)"
+          else
+            rc_ev=$?
+            failed+=("salesforce org test")
+            if [ "$rc_ev" = 2 ]; then why="no org test has been run"; else why="the source changed since the last org test"; fi
+            {
+              echo "FAIL  salesforce org test: $why."
+              echo "      Salesforce changes must be validated, deployed and tested in the org before finishing."
+              echo "      Run: bash $SCRIPT_DIR/org-test.sh   (sandbox or Developer Edition orgs only)"
+            } >&2
+          fi
+        else
+          skip "salesforce" "--no-salesforce"
+        fi
+        continue
+      fi
       if ! command -v sf >/dev/null; then skip "salesforce" "sf CLI not installed"; continue; fi
       if [ -s "$HOME/.nvm/nvm.sh" ] && [ "$(node -p 'process.versions.node.split(".")[0]' 2>/dev/null || echo 0)" -lt 22 ]; then
         # shellcheck disable=SC1091

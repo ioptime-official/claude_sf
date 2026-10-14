@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "test:e2e": "playwright test",
-    "test:agent-layer": "bash tests/hooks/test-block-prod-deploy.sh && bash tests/hooks/test-stop-verify-gate.sh && bash tests/hooks/test-guard-hooks.sh && bash tests/scripts/test-detect-stacks.sh && bash tests/plugin/test-plugin.sh",
+    "test:agent-layer": "bash tests/hooks/test-block-prod-deploy.sh && bash tests/hooks/test-stop-verify-gate.sh && bash tests/hooks/test-guard-hooks.sh && bash tests/scripts/test-detect-stacks.sh && bash tests/plugin/test-plugin.sh && bash tests/scripts/test-org-test.sh",
     "verify": "bash scripts/verify.sh --no-salesforce --full",
     "build:plugin": "bash scripts/build-plugin.sh"
   },

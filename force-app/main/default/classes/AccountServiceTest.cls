@@ -12,7 +12,7 @@ private class AccountServiceTest {
         Test.stopTest();
         System.assertEquals('Hot', accounts[0].Rating);
         System.assertEquals('Warm', accounts[1].Rating);
-        System.assertEquals('Undefined', accounts[2].Rating);
+        System.assertEquals('Cold', accounts[2].Rating);
     }
 
     @IsTest
@@ -49,6 +49,6 @@ private class AccountServiceTest {
         System.assertEquals('Hot', accounts[0].Rating);
         System.assertEquals('Warm', accounts[1].Rating);
         System.assertEquals('Warm', accounts[2].Rating);
-        System.assertEquals('Undefined', accounts[3].Rating);
+        System.assertEquals('Cold', accounts[3].Rating);
     }
 }

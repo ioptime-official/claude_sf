@@ -44,6 +44,7 @@ A Salesforce change is not done until it has been tested IN THE ORG, not just re
 ## Conventions
 - **Apex**: `with sharing` by default; no SOQL/DML in loops; bulk-safe for 200 records;
   one trigger per object with logic in a service class; tests assert behavior.
+- **Flows**: every new or changed flow is committed with `<status>Active</status>` so it is live on deploy.
 - **LWC**: base Lightning components, SLDS, no inline styles.
 - **.NET**: validate request models, no secrets in config files, typed HTTP clients.
 - **React**: no secrets in `VITE_*` variables, tests with Testing Library.

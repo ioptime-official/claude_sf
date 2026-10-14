@@ -23,6 +23,8 @@ description: House rules for writing Apex, triggers, flows and LWC in this codeb
 - One record-triggered flow per object per timing where possible; use entry criteria and
   "only when record is changed to meet criteria" to avoid re-firing.
 - Always add fault paths on create/update/delete elements.
+- New and changed flows must be `<status>Active</status>` in the metadata so they run as soon as
+  they deploy. Never commit a flow as Draft, Obsolete or InvalidDraft; `verify.sh` fails on it.
 
 ## LWC
 - Base Lightning components and SLDS; no inline styles; no hardcoded labels (use Custom Labels).

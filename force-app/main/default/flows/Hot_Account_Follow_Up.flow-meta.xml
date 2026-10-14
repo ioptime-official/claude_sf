@@ -1,7 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>62.0</apiVersion>
-    <description>When an Account becomes Hot, create a follow-up Task for the owner.</description>
+    <description>When an Account becomes Hot or Warm, create a follow-up Task for the owner.</description>
+    <decisions>
+        <name>Which_Rating</name>
+        <label>Which Rating</label>
+        <locationX>176</locationX>
+        <locationY>200</locationY>
+        <defaultConnectorLabel>Other</defaultConnectorLabel>
+        <rules>
+            <name>Is_Hot</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Rating</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Hot</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Create_Follow_Up_Task</targetReference>
+            </connector>
+            <label>Hot</label>
+        </rules>
+        <rules>
+            <name>Is_Warm</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Rating</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Warm</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Create_Warm_Follow_Up_Task</targetReference>
+            </connector>
+            <label>Warm</label>
+        </rules>
+    </decisions>
     <environments>Default</environments>
     <interviewLabel>Hot Account Follow Up {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Hot Account Follow Up</label>
@@ -43,19 +80,49 @@
         </inputAssignments>
         <object>Task</object>
     </recordCreates>
+    <recordCreates>
+        <name>Create_Warm_Follow_Up_Task</name>
+        <label>Create Warm Follow Up Task</label>
+        <locationX>440</locationX>
+        <locationY>323</locationY>
+        <inputAssignments>
+            <field>OwnerId</field>
+            <value>
+                <elementReference>$Record.OwnerId</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Priority</field>
+            <value>
+                <stringValue>Normal</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Subject</field>
+            <value>
+                <stringValue>Follow up with new Warm account</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>WhatId</field>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Task</object>
+    </recordCreates>
     <start>
         <locationX>50</locationX>
         <locationY>0</locationY>
         <connector>
-            <targetReference>Create_Follow_Up_Task</targetReference>
+            <targetReference>Which_Rating</targetReference>
         </connector>
-        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
         <filterLogic>and</filterLogic>
         <filters>
             <field>Rating</field>
-            <operator>EqualTo</operator>
+            <operator>IsChanged</operator>
             <value>
-                <stringValue>Hot</stringValue>
+                <booleanValue>true</booleanValue>
             </value>
         </filters>
         <object>Account</object>

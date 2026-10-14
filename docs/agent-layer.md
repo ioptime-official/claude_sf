@@ -96,6 +96,17 @@ in the eval prompt. Lesson: when an eval fails, check the harness before the pro
 - **The headless GitHub workflows have not run on GitHub's runners yet** (account billing lock).
   Their logic is exercised locally.
 
+- **The audit log only records tool calls that succeeded.** It is a PostToolUse hook, and a
+  failed command (non-zero exit, a blocked call) never reaches it. Found in the first live run:
+  a failed verify and the commit-and-push command were missing from the log. The fix is to also
+  register the failure event and to log denials from the blocking hooks. Until then, treat the log
+  as "what worked", not "everything the agent tried".
+- **Secret scan and lint only see the Edit and Write tools.** An agent that changes a file with
+  `sed -i` or a shell heredoc through Bash skips both. The first live run edited the flow that
+  way. Scanning staged changes in a pre-commit step closes this regardless of how files change.
+- **The agent pushed its branch to the repository's default remote without being asked.** That
+  is normal for opening a PR but should target the designated remote deliberately.
+
 ## Changing a protected file
 The agent cannot. A human edits it in a reviewed PR, or launches Claude Code with
 `ALLOW_PROTECTED_EDIT=1` for a deliberate session. This is intentional.

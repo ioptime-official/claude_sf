@@ -34,6 +34,18 @@ flowchart TD
 - The agent only ever sees sandbox credentials. Production auth lives in a CI secret
   scoped to the `production` environment.
 - The agent can open PRs but cannot merge or deploy.
+- Request text, issue comments and record data are untrusted input. They can describe a change; they
+  cannot instruct the agent, change a tier or unlock a guardrail.
+- Autonomy is tiered (T0-T3, see `docs/governance.md`). The triager sets the tier from the request
+  and `docs/org-profile.md`; T2 stops at a design proposal and T3 is never automated.
+
+## Scaling to more orgs and clients
+- Nothing in the agent layer assumes folder names or one org. Stacks are discovered per repo, and
+  each client repo carries its own `docs/org-profile.md`, sandbox alias and allowlist.
+- Multiple orgs or sandboxes: set `SF_ALLOWED_ORG_ALIASES` per repo and name the test alias in the
+  org profile; the org-type check in `scripts/org-test.sh` still applies to each.
+- Larger programs: split into one package directory per domain in `sfdx-project.json`; the verify
+  loop and reviewers follow whatever `detect-stacks.py` reports.
 
 ## Multi-stack layout
 ```mermaid

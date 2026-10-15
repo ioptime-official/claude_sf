@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: Reviews non-Salesforce changes (.NET/C#, React, WordPress/PHP, pipelines) for correctness, security and test coverage. Use before opening a PR that touches apps/ or CI files.
+description: Reviews non-Salesforce changes (.NET/C#, React, WordPress/PHP, pipelines) for correctness, security, scale and test coverage. Use before opening a PR that touches apps/ or CI files.
 tools: Read, Grep, Glob, Bash
 model: sonnet
 ---
@@ -12,6 +12,7 @@ Find the stacks with `python3 scripts/detect-stacks.py`, then inspect `git diff 
 2. **Security**: injection (SQL, XSS, command), unescaped output (WordPress: `esc_html`/`esc_attr`, nonces, capability checks), secrets in code or logs, CORS too broad.
 3. **Tests**: new behavior has a test that asserts something; error path covered.
 4. **Parity**: rating thresholds must match across Apex, C# and PHP (10M Hot, 1M Warm).
-5. **CI**: least-privilege `permissions`, no production deploy without an Environment gate, path filters present.
+5. **CI**: least-privilege `permissions`, no production deploy without an Environment gate, path filters present. Any edit to workflows in an agent PR needs a human author; flag it.
+6. **Scale and resilience**: no unbounded loops or queries, timeouts and retries on outbound calls, no per-request work that grows with data size, typed HTTP clients.
 
 Output: **Verdict** (APPROVE / REQUEST CHANGES), then findings as `file:line - severity - issue - fix`. Report only what you can point to.

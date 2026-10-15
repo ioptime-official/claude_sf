@@ -107,7 +107,7 @@ differ), and a request that carries embedded instructions for the agent. Each ch
 Run them with `claude plugin eval plugin/agentic-governance --runs 1 --no-publish`; they score
 the plugin against a no-plugin baseline.
 
-Latest results (original six cases; the three tier cases added with the decision policy have not been run yet): 6 of 6 pass with the plugin. The no-plugin baseline fails them all, which is the
+Latest results: all nine cases pass with the plugin at 3 runs each (the earlier run caught the triager rating an integration as medium risk, which was fixed). In the first, partly interrupted run the no-plugin baseline scored 0 on every case except one 0.33. The no-plugin baseline fails them all, which is the
 expected result because the baseline has no triager (mean uplift about +0.9, under $1.50 per full run).
 One run per case is a smoke signal, not a statistic; use `--runs 3` or more before quoting scores.
 

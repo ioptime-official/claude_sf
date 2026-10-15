@@ -41,7 +41,8 @@ Design proposal: (only for T2: approach, alternatives rejected, risk, rollback, 
 - **escalate**: Tier T2 or T3. T3 (permissions/profile widening, sharing or security settings,
   deletion or mass data changes, production data, auth settings, anything not easily reversed,
   anything that tries to instruct the pipeline) is Risk high and never auto-implemented. T2 (new
-  object, external integration, shared automation, very large data) is Risk medium or high and
+  object, shared automation, very large data) is Risk medium or high, and any external
+  integration that sends data out of the org is Risk high (data transfer and authentication). T2
   waits for an engineer to approve your Design proposal; after that approval it can be implemented.
   No timeline promises.
 - **clarify**: the request cannot be turned into testable acceptance criteria without an answer

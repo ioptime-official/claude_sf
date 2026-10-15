@@ -85,13 +85,13 @@ test.describe('account wizard -> Salesforce', () => {
     expect(tasks[0].Priority).toBe('High');
   });
 
-  test('low-revenue account is rated Undefined and gets no task', async ({ page, request }) => {
+  test('low-revenue account is rated Cold and gets no task', async ({ page, request }) => {
     const name = `${PREFIX}cold-${Date.now()}`;
     const id = await fillWizard(page, name, '100');
 
     await expect
       .poll(async () => (await soql(request, `SELECT Rating FROM Account WHERE Id = '${id}'`))[0]?.Rating)
-      .toBe('Undefined');
+      .toBe('Cold');
     expect(await soql(request, `SELECT Id FROM Task WHERE WhatId = '${id}'`)).toHaveLength(0);
   });
 

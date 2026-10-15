@@ -19,7 +19,7 @@ public with sharing class AccountService {
             } else if (acc.AnnualRevenue >= WARM_THRESHOLD) {
                 acc.Rating = 'Warm';
             } else {
-                acc.Rating = 'Undefined';
+                acc.Rating = 'Cold';
             }
         }
     }
